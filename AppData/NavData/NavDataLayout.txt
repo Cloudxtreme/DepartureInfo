@@ -1,0 +1,19 @@
+This file explains the Layout of NavData.txt
+
+C
+O
+l
+u
+m
+n
+#
+:
+
+1 		Runway
+10		Departure
+20		Full Departure Name
+50		Departure Transitions
+120		Initial heading off the runway (ATC Assigned, Runway Heading)
+150		First Fix ('RNAV to', or 'Vectors to')
+190		Flow (East or West)
+210		Correstponding Departure

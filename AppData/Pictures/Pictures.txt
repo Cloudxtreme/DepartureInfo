@@ -1,0 +1,2 @@
+East               AppData/Pictures/EastFlow.jpg
+West               AppData/Pictures/WestFlow.jpg
