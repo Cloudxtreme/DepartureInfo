@@ -27,7 +27,7 @@ class Connection(object):
             self.tablename = 'TABLENAME' #Use own Tablename
             self.meta = MetaData()
             self.engine = create_engine('mysql://%s:%s@ HOSTNAME/DATABASE' % (
-                self.username, self.password), pool_timeout=5) #imput own Host and Database
+                self.username, self.password), pool_timeout=5) #input own Host and Database
             self.atis = Table(self.tablename, self.meta, autoload=True, autoload_with=self.engine)
             self.conn = self.engine.connect()
         except Exception, error:
@@ -219,7 +219,8 @@ class ProgramWindow(QtGui.QMainWindow, Ui_MainWindow, Connection, Client):
                     pass
                 if constant == 0:
                     pass
-                    #self.depInfoBrowser.setText('')
+                    #self.depInfoBrowser.setText('') #I did have a reason for doing this in an olderver
+                    #                                #Will remove in a future version
                 else:
                     pass
         f.close()
