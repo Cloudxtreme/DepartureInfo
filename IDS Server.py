@@ -1,5 +1,4 @@
 __author__ = 'Reuben'
-__version__ = '.92'
 from twisted.internet import reactor, endpoints, protocol, defer
 import sys
 
@@ -16,12 +15,15 @@ class ServerProtocol(protocol.Protocol):
     def dataReceived(self, data):
         print 'Received and sending', data
         for connection in self.factory.connections:
-            connection.write(data)
+            if connection == self.transport:
+                pass
+            else:
+                connection.write(data)
 
 
 class IDSFactory(protocol.ServerFactory):
     protocol = ServerProtocol
     connections = []
 
-endpoints.serverFromString(reactor, 'tcp:PORTNUMBER').listen(IDSFactory())#Use own port number instead of 'PORTNUMBER'
+endpoints.serverFromString(reactor, 'tcp:8000').listen(IDSFactory())
 reactor.run()

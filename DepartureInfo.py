@@ -1,13 +1,14 @@
 __author__ = 'Reuben'
-__version__ = '.92'
+__version__ = '.921'
 import sys
 if 'twisted.internet.reactor' in sys.modules:
-    del sys.modules['twisted.internet.reactor'] #This is to be used when creating the EXE with pyinstaller
+    del sys.modules['twisted.internet.reactor'] #This is to be used when creating the EXE with pyinstaller.
 import qt4reactor
 qt4reactor.install()
 from twisted.internet import protocol, reactor
 from PyQt4 import QtCore, QtGui
 from departurewindow import Ui_MainWindow
+from popup import Ui_Popup
 import threading
 import time
 import requests
@@ -22,12 +23,12 @@ class Connection(object):
         #self.aiport = aiport
         #self.atis = atis
         try:
-            self.username = 'USERNAME' #Use Own Username
-            self.password = 'PASSWORD'  #Use own Password
-            self.tablename = 'TABLENAME' #Use own Tablename
+            self.username = 'USERNAME' #USE YOUR OWN CREDENTIALS
+            self.password = 'PASSWORD'
+            self.tablename = 'TABLENAME'
             self.meta = MetaData()
-            self.engine = create_engine('mysql://%s:%s@ HOSTNAME/DATABASE' % (
-                self.username, self.password), pool_timeout=5) #input own Host and Database
+            self.engine = create_engine('mysql://%s:%s@HOSTNAME/DATABASE' % (
+                self.username, self.password), pool_timeout=5) #USE YOUR OWN CREDENTIALS
             self.atis = Table(self.tablename, self.meta, autoload=True, autoload_with=self.engine)
             self.conn = self.engine.connect()
         except Exception, error:
@@ -50,8 +51,10 @@ class Client(protocol.Protocol):
         self.factory.connections.append(self.transport)
         client.append(self.transport)
     def dataReceived(self, data):
+
         if data.strip().lower() == 'atis':
             MainApp.atisAirportChanged()
+            Popup.show()
         else:
             return
     def connectionLost(self, reason):
@@ -86,6 +89,13 @@ class ClientFactory(protocol.ReconnectingClientFactory):
         protocol.ReconnectingClientFactory.clientConnectionFailed(self, connector, reason)
         global servererror
         servererror = 1
+
+class PopupWindow(QtGui.QWidget, Ui_Popup):
+    def __init__(self, parent=None):
+        QtGui.QWidget.__init__(self, parent)
+        self.setupUi(self)
+        self.updatePushButton.clicked.connect(self.close)
+
 
 class ProgramWindow(QtGui.QMainWindow, Ui_MainWindow, Connection, Client):
     def __init__(self, parent=None):
@@ -159,11 +169,7 @@ class ProgramWindow(QtGui.QMainWindow, Ui_MainWindow, Connection, Client):
                     constant = 1
                 else:
                     pass
-                if constant == 0:
-                    pass
-                    #self.depInfoBrowser.setText('')
-                else:
-                    pass
+
         f.close()
 
     @property
@@ -219,8 +225,7 @@ class ProgramWindow(QtGui.QMainWindow, Ui_MainWindow, Connection, Client):
                     pass
                 if constant == 0:
                     pass
-                    #self.depInfoBrowser.setText('') #I did have a reason for doing this in an olderver
-                    #                                #Will remove in a future version
+                    #self.depInfoBrowser.setText('')
                 else:
                     pass
         f.close()
@@ -265,7 +270,7 @@ class ProgramWindow(QtGui.QMainWindow, Ui_MainWindow, Connection, Client):
         else:
             currairport = str(self.idAirportList.currentText())
             conn = self.engine.connect()
-            s = select([self.atis]).where(self.atis.c.aiport == currairport)
+            s = select([self.atis]).where(self.atis.c.COLUMNNAME == currairport)#USE OWN DATABASE INFO
             result = conn.execute(s)
             row = result.fetchone()
             atis = row[1]
@@ -281,8 +286,8 @@ class ProgramWindow(QtGui.QMainWindow, Ui_MainWindow, Connection, Client):
             currairport = str(self.idAirportList.currentText())
             conn = self.engine.connect()
             upd = self.atis.update().\
-                where(self.atis.c.aiport == currairport).\
-                values(atis_id = atis1)
+                where(self.atis.c.COLUMNNAME == currairport).\
+                values(COLUMNNAME = atis1)#USE YOUR OWN INFORMATION
             conn.execute(upd)
             conn.close()
             self.sendData('atis')
@@ -309,18 +314,21 @@ class ProgramWindow(QtGui.QMainWindow, Ui_MainWindow, Connection, Client):
     def closeEvent(self, e):
         reactor.stop()
 
+
+
+
 if __name__ == '__main__':
     app = QtGui.QApplication(sys.argv)
     MainApp = ProgramWindow()
     MainApp.show()
-
+    Popup = PopupWindow()
     #Threading Weather
     wxthread = threading.Thread(target=MainApp.getMetarThread)
     wxthread.setDaemon(True)
     wxthread.start()
     #twisted stuff
 
-    reactor.connectTCP('HOSTNAME', 99999 ,ClientFactory()) #Use own Host and Port
+    reactor.connectTCP('HOSTNAME', PORTNUMBER,ClientFactory()) #USE YOUR OWN INFORMATION
     reactor.run()
 
 
