@@ -2,7 +2,7 @@ __author__ = 'Reuben'
 __version__ = '.921'
 import sys
 if 'twisted.internet.reactor' in sys.modules:
-    del sys.modules['twisted.internet.reactor'] #This is to be used when creating the EXE with pyinstaller.
+    del sys.modules['twisted.internet.reactor'] #This is to be used when creating the EXE with pyinstaller
 import qt4reactor
 qt4reactor.install()
 from twisted.internet import protocol, reactor
@@ -94,6 +94,7 @@ class PopupWindow(QtGui.QWidget, Ui_Popup):
     def __init__(self, parent=None):
         QtGui.QWidget.__init__(self, parent)
         self.setupUi(self)
+        self.setWindowFlags(self.windowFlags() ^ QtCore.Qt.WindowStaysOnTopHint)
         self.updatePushButton.clicked.connect(self.close)
 
 
@@ -221,11 +222,6 @@ class ProgramWindow(QtGui.QMainWindow, Ui_MainWindow, Connection, Client):
                     self.departureFirstFixBrowser.setText(line[159:189].strip())
                     self.departureTransitionsBrowser.setText(line[61:119].strip())
                     constant = 1
-                else:
-                    pass
-                if constant == 0:
-                    pass
-                    #self.depInfoBrowser.setText('')
                 else:
                     pass
         f.close()
